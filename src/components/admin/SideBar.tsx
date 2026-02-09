@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { X } from "lucide-react";
-import logo from "../../../dist/assets/logo.png";
+
 
 
 interface SideBarProps {
@@ -35,7 +35,7 @@ export default function SideBar({ isOpen, onClose }: SideBarProps) {
                         <div className="flex items-center gap-3">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#742f37] text-white">
                                 <span className="material-symbols-outlined text-[22px]">
-                                    <img src={logo} alt="Logo" className="w-[22px] h-[22px] object-contain" />
+                                    <img src="/logo.png" alt="Logo" className="w-[22px] h-[22px] object-contain" />
                                 </span>
                             </div>
                             <div>
