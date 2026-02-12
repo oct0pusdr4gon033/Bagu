@@ -1,75 +1,34 @@
-
 export class Producto {
-    private _id_producto?: number;
-    private _nombre_producto: string;
-    private _descripcion_producto: string;
-    private _precio_base: number;
-    private _imagen: string;
-    private _estado_producto: "ACTIVO" | "INACTIVO";
-    //private _id_categoria?: number;
-    //private _id_genero?: number;
-    //private _id_tamaño?: number;
-    //private _created_at?: Date;
+    id_producto?: number;
+    nombre_producto: string;
+    descripcion_producto: string;
+    precio_base: number;
+    imagen_url: string; // Changed from imagen to match DB
+    estado_producto: "ACTIVO" | "INACTIVO" | "disponible"; // added disponible as it is default in DB
+    id_categoria?: number;
+    id_genero?: number;
+    id_tamano?: number; // Changed from id_tamaño to match DB (often DB uses ascii) but SQL says id_tamano
+    precio_oferta?: number;
+    en_oferta?: boolean;
+    destacado?: boolean;
+    created_at?: Date;
 
-    constructor(
-        nombre_producto: string,
-        descripcion_producto: string,
-        precio_base: number,
-        imagen: string
-    ) {
-        this._nombre_producto = nombre_producto;
-        this._descripcion_producto = descripcion_producto;
-        this._precio_base = precio_base;
-        this._imagen = imagen;
-        this._estado_producto = "ACTIVO"; // default inteligente
-    }
+    // Optional: relations for UI display
+    categoria?: { nombre_categoria: string };
 
-    // ===== GETTERS =====
-    get id_producto() {
-        return this._id_producto;
-    }
-
-    get nombre_producto() {
-        return this._nombre_producto;
-    }
-
-    get descripcion_producto() {
-        return this._descripcion_producto;
-    }
-
-    get precio_base() {
-        return this._precio_base;
-    }
-
-    get imagen() {
-        return this._imagen;
-    }
-
-    get estado_producto() {
-        return this._estado_producto;
-    }
-
-    // ===== SETTERS =====
-    set nombre_producto(value: string) {
-        this._nombre_producto = value;
-    }
-
-    set descripcion_producto(value: string) {
-        this._descripcion_producto = value;
-    }
-
-    set precio_base(value: number) {
-        if (value <= 0) {
-            throw new Error("El precio debe ser mayor a 0");
-        }
-        this._precio_base = value;
-    }
-
-    set imagen(value: string) {
-        this._imagen = value;
-    }
-
-    set estado_producto(value: "ACTIVO" | "INACTIVO") {
-        this._estado_producto = value;
+    constructor(data: Partial<Producto>) {
+        this.id_producto = data.id_producto;
+        this.nombre_producto = data.nombre_producto || '';
+        this.descripcion_producto = data.descripcion_producto || '';
+        this.precio_base = data.precio_base || 0;
+        this.imagen_url = data.imagen_url || '';
+        this.estado_producto = data.estado_producto || 'ACTIVO';
+        this.id_categoria = data.id_categoria;
+        this.id_genero = data.id_genero;
+        this.id_tamano = data.id_tamano;
+        this.precio_oferta = data.precio_oferta;
+        this.en_oferta = data.en_oferta;
+        this.destacado = data.destacado;
+        this.created_at = data.created_at;
     }
 }

@@ -66,6 +66,7 @@ export default function SideBar({ isOpen, onClose }: SideBarProps) {
                             { icon: "inventory_2", label: "Productos", path: "/admin/productos" },
                             { icon: "person", label: "Clientes", path: "/admin/clientes" },
                             { icon: "shopping_cart", label: "Pedidos", path: "/admin/pedidos" },
+                            { icon: "shelves", label: "Materiales", path: "/admin/materiales" },
                         ].map((item) => {
                             const isActive = location.pathname === item.path;
                             return (
