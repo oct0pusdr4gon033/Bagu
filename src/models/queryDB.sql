@@ -1,4 +1,4 @@
--- DROP SCHEMA api;
+- DROP SCHEMA api;
 
 CREATE SCHEMA api AUTHORIZATION postgres;
 
@@ -289,6 +289,8 @@ CREATE TABLE api.venta (
 	id_tipo_pedido int8 NULL,
 	total_venta numeric(10, 2) NULL,
 	fecha_venta timestamp DEFAULT now() NULL,
+	direccion_envio text NULL,
+	notas text NULL,
 	CONSTRAINT venta_pkey PRIMARY KEY (id_venta),
 	CONSTRAINT venta_id_comprador_fkey FOREIGN KEY (id_comprador) REFERENCES api.cliente(dni_cliente),
 	CONSTRAINT venta_id_tipo_pedido_fkey FOREIGN KEY (id_tipo_pedido) REFERENCES api.tipo_pedido(id_tipo_pedido)
@@ -313,7 +315,6 @@ CREATE TABLE api.detalle_venta (
 );
 
 
-
 -- DROP FUNCTION api.allow_public_read();
 
 CREATE OR REPLACE FUNCTION api.allow_public_read()
@@ -324,63 +325,3 @@ AS $function$
   select true;
 $function$
 ;
-
--- ============================================
--- POLÍTICAS RLS PARA producto_color
--- ============================================
-
-ALTER TABLE api.producto_color ENABLE ROW LEVEL SECURITY;
-
--- Permitir INSERT para usuarios autenticados
-CREATE POLICY "Enable insert for authenticated users on producto_color"
-ON api.producto_color FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
--- Permitir SELECT para todos
-CREATE POLICY "Enable read for all users on producto_color"
-ON api.producto_color FOR SELECT
-TO anon, authenticated
-USING (true);
-
--- Permitir DELETE para usuarios autenticados
-CREATE POLICY "Enable delete for authenticated users on producto_color"
-ON api.producto_color FOR DELETE
-TO authenticated
-USING (true);
-
--- Permitir UPDATE para usuarios autenticados
-CREATE POLICY "Enable update for authenticated users on producto_color"
-ON api.producto_color FOR UPDATE
-TO authenticated
-USING (true);
-
--- ============================================
--- POLÍTICAS RLS PARA producto_imagen
--- ============================================
-
-ALTER TABLE api.producto_imagen ENABLE ROW LEVEL SECURITY;
-
--- Permitir INSERT para usuarios autenticados
-CREATE POLICY "Enable insert for authenticated users on producto_imagen"
-ON api.producto_imagen FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
--- Permitir SELECT para todos
-CREATE POLICY "Enable read for all users on producto_imagen"
-ON api.producto_imagen FOR SELECT
-TO anon, authenticated
-USING (true);
-
--- Permitir DELETE para usuarios autenticados
-CREATE POLICY "Enable delete for authenticated users on producto_imagen"
-ON api.producto_imagen FOR DELETE
-TO authenticated
-USING (true);
-
--- Permitir UPDATE para usuarios autenticados
-CREATE POLICY "Enable update for authenticated users on producto_imagen"
-ON api.producto_imagen FOR UPDATE
-TO authenticated
-USING (true);
