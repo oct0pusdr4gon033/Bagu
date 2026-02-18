@@ -15,7 +15,8 @@ export class VentaService {
                 estado_pedido:id_estado (*),
                 detalles:detalle_venta (
                     *,
-                    producto:id_producto (*)
+                    producto:id_producto (*),
+                    color:id_color (*)
                 )
             `)
             .order('fecha_venta', { ascending: false });
@@ -38,7 +39,8 @@ export class VentaService {
                 estado_pedido:id_estado (*),
                 detalles:detalle_venta (
                     *,
-                    producto:id_producto (*)
+                    producto:id_producto (*),
+                    color:id_color (*)
                 )
             `)
             .eq('id_venta', id)
@@ -79,8 +81,11 @@ export class VentaService {
             // 2. Insert Details
             if (detalles.length > 0) {
                 const detallesWithId = detalles.map(d => ({
-                    ...d,
-                    id_venta: ventaId
+                    id_venta: ventaId,
+                    id_producto: d.id_producto,
+                    cantidad: d.cantidad,
+                    precio_unitario: d.precio_unitario,
+                    id_color: d.id_color
                 }));
 
                 const { error: detallesError } = await supabase

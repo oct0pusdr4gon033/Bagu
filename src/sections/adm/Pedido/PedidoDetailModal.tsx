@@ -66,9 +66,15 @@ export default function PedidoDetailModal({ pedido, onClose }: PedidoDetailModal
                                         <p className="font-semibold text-gray-900">
                                             {detalle.producto?.nombre_producto || 'Producto no encontrado'}
                                         </p>
-                                        <p className="text-sm text-gray-500">
-                                            Cantidad: {detalle.cantidad}
-                                        </p>
+                                        <div className="flex gap-2 items-center text-sm text-gray-500">
+                                            <span>Mostrando {detalle.cantidad} unidades</span>
+                                            {detalle.color && (
+                                                <span className="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-gray-200 text-xs">
+                                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: detalle.color.codigo_color }}></span>
+                                                    {detalle.color.nombre_color}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold text-[#742f37] text-lg">

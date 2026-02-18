@@ -236,6 +236,7 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
                                         </option>
                                     ))}
                                 </select>
+
                             </div>
 
                             {/* Size (Tamano) */}

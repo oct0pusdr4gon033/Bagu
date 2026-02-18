@@ -1,11 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Trash, Plus, Minus, ArrowLeft } from 'lucide-react';
+import { Search, Trash, Plus, Minus, ArrowLeft, X } from 'lucide-react'; // Added X for modal
 import Button from '../../components/admin/Button';
 import { Cliente } from '../../models/Cliente';
 import { Producto } from '../../models/Producto';
 import { VentaService } from '../../services/Venta.service';
 import { supabase } from '../../lib/supabase';
+
+interface Color {
+    id_color: number;
+    nombre_color: string;
+    codigo_color: string;
+}
+
+interface CartItem {
+    product: Producto;
+    quantity: number;
+    color?: Color;
+}
 
 export default function NuevoPedido() {
     const navigate = useNavigate();
@@ -16,12 +28,17 @@ export default function NuevoPedido() {
     const [clientError, setClientError] = useState('');
 
     const [productSearch, setProductSearch] = useState('');
-    const [searchResults, setSearchResults] = useState<Producto[]>([]);
-    const [cart, setCart] = useState<{ product: Producto, quantity: number }[]>([]);
+    const [searchResults, setSearchResults] = useState<any[]>([]); // product with colors
+    const [cart, setCart] = useState<CartItem[]>([]);
 
     const [shippingAddress, setShippingAddress] = useState('');
     const [notes, setNotes] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Color Selection Modal State
+    const [colorModalOpen, setColorModalOpen] = useState(false);
+    const [productToSelect, setProductToSelect] = useState<any | null>(null);
+    const [availableColors, setAvailableColors] = useState<Color[]>([]);
 
     // Search Client
     const handleSearchClient = async () => {
@@ -54,10 +71,15 @@ export default function NuevoPedido() {
                 setSearchResults([]);
                 return;
             }
-            // Use existing service or simple query
+            // Fetch products AND their colors
             const { data } = await supabase
                 .from('producto')
-                .select('*')
+                .select(`
+                    *,
+                    producto_color (
+                        color:id_color (*)
+                    )
+                `)
                 .ilike('nombre_producto', `%${productSearch}%`)
                 .limit(5);
 
@@ -69,25 +91,45 @@ export default function NuevoPedido() {
     }, [productSearch]);
 
     // Cart Actions
-    const addToCart = (product: Producto) => {
+    const initiateAddToCart = (product: any) => {
+        const colors = product.producto_color?.map((pc: any) => pc.color) || [];
+        if (colors.length > 0) {
+            setProductToSelect(product);
+            setAvailableColors(colors);
+            setColorModalOpen(true);
+        } else {
+            addToCart(product, undefined);
+        }
+    };
+
+    const addToCart = (product: Producto, color?: Color) => {
         setCart(prev => {
-            const existing = prev.find(item => item.product.id_producto === product.id_producto);
+            // Check if same product AND same color exists
+            const existing = prev.find(item =>
+                item.product.id_producto === product.id_producto &&
+                item.color?.id_color === color?.id_color
+            );
+
             if (existing) {
                 return prev.map(item =>
-                    item.product.id_producto === product.id_producto
+                    (item.product.id_producto === product.id_producto && item.color?.id_color === color?.id_color)
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             }
-            return [...prev, { product, quantity: 1 }];
+            return [...prev, { product, quantity: 1, color }];
         });
+
+        // Reset search and modal
         setProductSearch('');
         setSearchResults([]);
+        setColorModalOpen(false);
+        setProductToSelect(null);
     };
 
-    const updateQuantity = (productId: number, delta: number) => {
+    const updateQuantity = (productId: number, colorId: number | undefined, delta: number) => {
         setCart(prev => prev.map(item => {
-            if (item.product.id_producto === productId) {
+            if (item.product.id_producto === productId && item.color?.id_color === colorId) {
                 const newQuantity = Math.max(1, item.quantity + delta);
                 return { ...item, quantity: newQuantity };
             }
@@ -95,11 +137,19 @@ export default function NuevoPedido() {
         }));
     };
 
-    const removeFromCart = (productId: number) => {
-        setCart(prev => prev.filter(item => item.product.id_producto !== productId));
+    const removeFromCart = (productId: number, colorId: number | undefined) => {
+        setCart(prev => prev.filter(item => !(item.product.id_producto === productId && item.color?.id_color === colorId)));
     };
 
-    const total = cart.reduce((sum, item) => sum + ((item.product.precio_base || 0) * item.quantity), 0);
+    // Helper to get effective price
+    const getPrice = (product: Producto) => {
+        if (product.en_oferta && product.precio_oferta) {
+            return product.precio_oferta;
+        }
+        return product.precio_base || 0;
+    };
+
+    const total = cart.reduce((sum, item) => sum + (getPrice(item.product) * item.quantity), 0);
 
     // Create Order
     const handleSubmit = async () => {
@@ -126,7 +176,8 @@ export default function NuevoPedido() {
             const detallesData = cart.map(item => ({
                 id_producto: item.product.id_producto,
                 cantidad: item.quantity,
-                precio_unitario: item.product.precio_base || 0
+                precio_unitario: getPrice(item.product),
+                id_color: item.color?.id_color
             }));
 
             await VentaService.create(ventaData, detallesData);
@@ -140,7 +191,35 @@ export default function NuevoPedido() {
     };
 
     return (
-        <div className="h-[calc(100vh-6rem)] flex flex-col">
+        <div className="h-[calc(100vh-6rem)] flex flex-col relative">
+            {/* Color Selection Modal */}
+            {colorModalOpen && productToSelect && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full animate-in fade-in zoom-in duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-[#742f37]">Seleccionar Color</h3>
+                            <button onClick={() => setColorModalOpen(false)}><X className="w-5 h-5 text-gray-500" /></button>
+                        </div>
+                        <p className="mb-4 text-sm text-gray-600">Elige un color para <strong>{productToSelect.nombre_producto}</strong>:</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            {availableColors.map(color => (
+                                <button
+                                    key={color.id_color}
+                                    onClick={() => addToCart(productToSelect, color)}
+                                    className="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 hover:border-[#742f37] transition-colors"
+                                >
+                                    <span
+                                        className="w-4 h-4 rounded-full border border-gray-200"
+                                        style={{ backgroundColor: color.codigo_color }}
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">{color.nombre_color}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center gap-4 mb-6 flex-shrink-0">
                 <button
                     onClick={() => navigate('/admin/pedidos')}
@@ -200,19 +279,33 @@ export default function NuevoPedido() {
 
                             {searchResults.length > 0 && (
                                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 z-50 max-h-60 overflow-y-auto">
-                                    {searchResults.map(product => (
-                                        <button
-                                            key={product.id_producto}
-                                            onClick={() => addToCart(product)}
-                                            className="w-full text-left p-3 hover:bg-gray-50 border-b border-gray-50 flex justify-between items-center"
-                                        >
-                                            <div>
-                                                <p className="font-medium text-gray-900">{product.nombre_producto}</p>
-                                                <p className="text-xs text-gray-500">${(product.precio_base || 0).toLocaleString()}</p>
-                                            </div>
-                                            <Plus className="w-4 h-4 text-[#742f37]" />
-                                        </button>
-                                    ))}
+                                    {searchResults.map(product => {
+                                        const price = getPrice(product);
+                                        const hasOffer = product.en_oferta && product.precio_oferta;
+
+                                        return (
+                                            <button
+                                                key={product.id_producto}
+                                                onClick={() => initiateAddToCart(product)}
+                                                className="w-full text-left p-3 hover:bg-gray-50 border-b border-gray-50 flex justify-between items-center"
+                                            >
+                                                <div>
+                                                    <p className="font-medium text-gray-900">{product.nombre_producto}</p>
+                                                    <div className="flex items-center gap-2 text-xs">
+                                                        {hasOffer ? (
+                                                            <>
+                                                                <span className="text-gray-400 line-through">${(product.precio_base || 0).toLocaleString()}</span>
+                                                                <span className="text-red-600 font-bold">${price.toLocaleString()}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-gray-500">${price.toLocaleString()}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <Plus className="w-4 h-4 text-[#742f37]" />
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -259,23 +352,37 @@ export default function NuevoPedido() {
                                 <p>No hay productos en el pedido</p>
                             </div>
                         ) : (
-                            cart.map(item => (
-                                <div key={item.product.id_producto} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                    <div className="flex-1">
-                                        <p className="font-medium text-gray-900">{item.product.nombre_producto}</p>
-                                        <p className="text-sm text-gray-500">${(item.product.precio_base || 0).toLocaleString()} x {item.quantity}</p>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex items-center bg-white rounded-lg border border-gray-200 shadow-sm">
-                                            <button onClick={() => updateQuantity(item.product.id_producto!, -1)} className="p-2 hover:bg-gray-50 rounded-l-lg text-gray-600"><Minus className="w-4 h-4" /></button>
-                                            <span className="w-10 text-center font-medium text-gray-900">{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.product.id_producto!, 1)} className="p-2 hover:bg-gray-50 rounded-r-lg text-gray-600"><Plus className="w-4 h-4" /></button>
+                            cart.map((item, index) => {
+                                // Unique key using product id and color id (or index as fallback if no color)
+                                const key = `${item.product.id_producto}-${item.color?.id_color || 'no-color'}`;
+                                const price = getPrice(item.product);
+
+                                return (
+                                    <div key={key} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-900">{item.product.nombre_producto}</p>
+                                            <div className="flex gap-2 items-center text-sm">
+                                                <span className="text-gray-500">${price.toLocaleString()} x {item.quantity}</span>
+                                                {item.color && (
+                                                    <span className="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-gray-200 text-xs">
+                                                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color.codigo_color }}></span>
+                                                        {item.color.nombre_color}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                        <p className="font-bold text-[#742f37] w-24 text-right">${((item.product.precio_base || 0) * item.quantity).toLocaleString()}</p>
-                                        <button onClick={() => removeFromCart(item.product.id_producto!)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash className="w-5 h-5" /></button>
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex items-center bg-white rounded-lg border border-gray-200 shadow-sm">
+                                                <button onClick={() => updateQuantity(item.product.id_producto!, item.color?.id_color, -1)} className="p-2 hover:bg-gray-50 rounded-l-lg text-gray-600"><Minus className="w-4 h-4" /></button>
+                                                <span className="w-10 text-center font-medium text-gray-900">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.product.id_producto!, item.color?.id_color, 1)} className="p-2 hover:bg-gray-50 rounded-r-lg text-gray-600"><Plus className="w-4 h-4" /></button>
+                                            </div>
+                                            <p className="font-bold text-[#742f37] w-24 text-right">${(price * item.quantity).toLocaleString()}</p>
+                                            <button onClick={() => removeFromCart(item.product.id_producto!, item.color?.id_color)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash className="w-5 h-5" /></button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
 
