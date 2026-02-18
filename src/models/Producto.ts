@@ -15,6 +15,7 @@ export class Producto {
 
     // Optional: relations for UI display
     categoria?: { nombre_categoria: string };
+    imagenes?: { id_imagen: number; imagen_url: string }[]; // Relation from producto_imagen
 
     constructor(data: Partial<Producto>) {
         this.id_producto = data.id_producto;
@@ -30,5 +31,6 @@ export class Producto {
         this.en_oferta = data.en_oferta;
         this.destacado = data.destacado;
         this.created_at = data.created_at;
+        this.imagenes = data.imagenes;
     }
 }

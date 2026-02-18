@@ -11,8 +11,8 @@ export default function PedidoDetailModal({ pedido, onClose }: PedidoDetailModal
 
     const getStatusStyle = (statusName: string | undefined) => {
         switch (statusName) {
-            case 'Pendiente': return 'bg-yellow-100 text-yellow-800';
-            case 'En Proceso': return 'bg-blue-100 text-blue-800';
+            case 'Pendiente': return 'bg-amber-100 text-amber-900';
+            case 'En Proceso': return 'bg-amber-100 text-amber-900';
             case 'Entregado': return 'bg-green-100 text-green-800';
             case 'Cancelado': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
@@ -91,8 +91,8 @@ export default function PedidoDetailModal({ pedido, onClose }: PedidoDetailModal
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="font-semibold text-gray-700">Estado:</span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(pedido.tipo_pedido?.nombre_tipo)}`}>
-                                {pedido.tipo_pedido?.nombre_tipo || 'Desconocido'}
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(pedido.estado_pedido?.nombre_estado)}`}>
+                                {pedido.estado_pedido?.nombre_estado || 'Desconocido'}
                             </span>
                         </div>
                         {pedido.notas && (

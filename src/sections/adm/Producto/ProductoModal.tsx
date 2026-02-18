@@ -3,13 +3,16 @@ import { X, Plus } from 'lucide-react';
 import { Producto } from '../../../models/Producto';
 import { Categoria } from '../../../models/Categoria';
 import { Colores } from '../../../models/Colores';
+import type { Genero } from '../../../models/Genero';
 import { getCategorias } from '../../../services/Categoria.service';
 import { getColores } from '../../../services/Colores.service';
+import { getGeneros } from '../../../services/Genero.service';
+import { getTamanoByProductoId } from '../../../services/Tamano.service';
 
 interface ProductoModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (producto: Partial<Producto>, images: File[], colorIds: number[]) => Promise<void>;
+    onSubmit: (producto: Partial<Producto>, images: File[], colorIds: number[], tamano?: { ancho: number; length: number }) => Promise<void>;
     initialProduct?: Producto;
     isSaving?: boolean;
 }
@@ -24,17 +27,21 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
         destacado: false,
         estado_producto: 'ACTIVO',
         id_categoria: undefined,
+        id_genero: undefined,
         imagen_url: ''
     });
 
+    const [tamanoData, setTamanoData] = useState<{ id_tamano?: number, ancho: number; length: number }>({ ancho: 0, length: 0 });
+
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [colores, setColores] = useState<Colores[]>([]);
+    const [generos, setGeneros] = useState<Genero[]>([]);
     const [selectedColorIds, setSelectedColorIds] = useState<number[]>([]);
 
     // Image handling
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    const [existingImages, setExistingImages] = useState<string[]>([]); // For edit mode
+    const [relatedImages, setRelatedImages] = useState<{ id_imagen: number; imagen_url: string; id_producto: number }[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -42,11 +49,16 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
             loadDependencies();
             if (initialProduct) {
                 setFormData(initialProduct);
-                // Handle existing images - splitting by comma if stored that way or just single
-                if (initialProduct.imagen_url) {
-                    setExistingImages([initialProduct.imagen_url]);
+                setRelatedImages(initialProduct.imagenes?.map(img => ({ ...img, id_producto: initialProduct.id_producto! })) || []);
+
+                // Fetch colors for this product if necessary, assuming passed in initialProduct logic handled elsewhere or needs explicit fetch
+                // For now, handling size loading
+                if (initialProduct.id_producto) {
+                    getTamanoByProductoId(initialProduct.id_producto).then(t => {
+                        if (t) setTamanoData({ id_tamano: t.id_tamano, ancho: t.ancho, length: t.largo });
+                        else setTamanoData({ ancho: 0, length: 0 });
+                    });
                 }
-                // TODO: Load related colors if needed
             } else {
                 resetForm();
             }
@@ -55,9 +67,11 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
 
     const loadDependencies = async () => {
         try {
-            const [cats, cols] = await Promise.all([getCategorias(), getColores()]);
+            const [cats, cols, gens] = await Promise.all([getCategorias(), getColores(), getGeneros()]);
             setCategorias(cats.filter(c => c.estado_categoria)); // Only active categories
             setColores(cols.filter(c => c.estado)); // Only active colors
+            console.log("Setting generos in modal:", gens);
+            setGeneros(gens);
         } catch (error) {
             console.error("Error loading dependencies:", error);
         }
@@ -73,11 +87,13 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
             destacado: false,
             estado_producto: 'ACTIVO',
             id_categoria: undefined,
+            id_genero: undefined,
             imagen_url: ''
         });
+        setTamanoData({ ancho: 0, length: 0 });
         setImageFiles([]);
         setImagePreviews([]);
-        setExistingImages([]);
+        setRelatedImages([]);
         setSelectedColorIds([]);
     };
 
@@ -100,14 +116,30 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
         );
     };
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files);
-            setImageFiles(prev => [...prev, ...newFiles]);
 
-            // Create previews
-            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-            setImagePreviews(prev => [...prev, ...newPreviews]);
+            if (initialProduct?.id_producto) {
+                // IMMEDIATE UPLOAD MODE (Edit)
+                try {
+                    // Upload each file
+                    for (const file of newFiles) {
+                        const result = await import('../../../services/Producto.service').then(m => m.ProductoService.uploadAndLinkImage(initialProduct.id_producto!, file));
+                        if (result) {
+                            setRelatedImages(prev => [...prev, result]);
+                        }
+                    }
+                } catch (error) {
+                    alert("Error al subir imagen(es). Intente de nuevo.");
+                }
+            } else {
+                // BATCH MODE (New Product)
+                setImageFiles(prev => [...prev, ...newFiles]);
+                // Create previews
+                const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+                setImagePreviews(prev => [...prev, ...newPreviews]);
+            }
         }
     };
 
@@ -120,9 +152,7 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
         });
     };
 
-    const removeExistingImage = (index: number) => {
-        setExistingImages(prev => prev.filter((_, i) => i !== index));
-    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -132,7 +162,7 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
             return;
         }
 
-        await onSubmit(formData, imageFiles, selectedColorIds);
+        await onSubmit(formData, imageFiles, selectedColorIds, tamanoData);
     };
 
     if (!isOpen) return null;
@@ -188,6 +218,48 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+
+                            {/* Genero */}
+                            <div className="col-span-1 md:col-span-1">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Género</label>
+                                <select
+                                    name="id_genero"
+                                    value={formData.id_genero || ''}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#742f37] focus:border-[#742f37]"
+                                >
+                                    <option value="">Seleccionar Género</option>
+                                    {generos.map(gen => (
+                                        <option key={gen.id_genero} value={gen.id_genero}>
+                                            {gen.nombre_genero}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Size (Tamano) */}
+                            <div className="col-span-1 md:col-span-1 flex space-x-2">
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ancho (cm)</label>
+                                    <input
+                                        type="number"
+                                        value={tamanoData.ancho}
+                                        onChange={(e) => setTamanoData(prev => ({ ...prev, ancho: parseFloat(e.target.value) || 0 }))}
+                                        min="0"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#742f37] focus:border-[#742f37]"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Largo (cm)</label>
+                                    <input
+                                        type="number"
+                                        value={tamanoData.length}
+                                        onChange={(e) => setTamanoData(prev => ({ ...prev, length: parseFloat(e.target.value) || 0 }))}
+                                        min="0"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#742f37] focus:border-[#742f37]"
+                                    />
+                                </div>
                             </div>
 
                             {/* Description */}
@@ -283,28 +355,84 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
                             <div className="col-span-1 md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes del Producto</label>
 
-                                {/* Existing Images */}
-                                {existingImages.length > 0 && (
-                                    <div className="space-y-3 mb-4">
-                                        {existingImages.map((url, idx) => (
-                                            <div key={`existing-${idx}`} className="flex items-center space-x-4 p-2 border border-gray-200 rounded-md">
-                                                <img src={url} alt="Preview" className="h-16 w-16 object-cover rounded" />
-                                                <span className="flex-1 text-sm text-gray-500 truncate">{url}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeExistingImage(idx)}
-                                                    className="px-3 py-1 bg-red-50 text-red-600 rounded-md hover:bg-red-100 text-sm font-medium"
-                                                >
-                                                    Eliminar
-                                                </button>
+                                {/* Current Main Image Display */}
+                                {formData.imagen_url && (
+                                    <div className="mb-6 p-4 border rounded-lg bg-gray-50 flex items-center justify-between">
+                                        <div>
+                                            <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Imagen Principal Actual</span>
+                                            <div className="h-32 w-32 border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                                                <img src={formData.imagen_url} alt="Main" className="w-full h-full object-contain" />
                                             </div>
-                                        ))}
+                                        </div>
+                                        <div className="text-sm text-gray-500 italic px-4">
+                                            Selecciona una imagen de la lista inferior para cambiar la principal.
+                                        </div>
                                     </div>
                                 )}
 
-                                {/* New Image Previews */}
+                                <div className="border-t border-gray-200 my-4 pt-4">
+                                    <h4 className="text-sm font-medium text-gray-700 mb-2">Galería de Imágenes</h4>
+
+                                    {/* Existing Related ImagesSelector */}
+                                    {relatedImages && relatedImages.length > 0 ? (
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                                            {relatedImages.map((img) => {
+                                                const isMain = formData.imagen_url === img.imagen_url;
+                                                return (
+                                                    <div
+                                                        key={`related-${img.id_imagen}`}
+                                                        className={`relative group border-2 rounded-lg p-2 transition-all cursor-pointer ${isMain ? 'border-[#742f37] bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
+                                                        onClick={() => setFormData(prev => ({ ...prev, imagen_url: img.imagen_url }))}
+                                                    >
+                                                        <div className="aspect-square rounded overflow-hidden bg-white mb-2">
+                                                            <img src={img.imagen_url} alt="Related" className="w-full h-full object-contain" />
+                                                        </div>
+
+                                                        {/* Selection Indicator */}
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center">
+                                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-2 ${isMain ? 'border-[#742f37] bg-[#742f37]' : 'border-gray-400'}`}>
+                                                                    {isMain && <div className="w-2 h-2 bg-white rounded-full" />}
+                                                                </div>
+                                                                <span className={`text-xs font-medium ${isMain ? 'text-[#742f37]' : 'text-gray-500'}`}>
+                                                                    {isMain ? 'Principal' : 'Seleccionar'}
+                                                                </span>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation(); // Prevent selection when deleting
+                                                                    if (confirm('¿Eliminar imagen relacionada?')) {
+                                                                        try {
+                                                                            await import('../../../services/Producto.service').then(m => m.ProductoService.deleteRelatedImage(img.id_imagen));
+                                                                            setRelatedImages(prev => prev.filter(i => i.id_imagen !== img.id_imagen));
+                                                                            if (isMain) {
+                                                                                setFormData(prev => ({ ...prev, imagen_url: '' }));
+                                                                            }
+                                                                        } catch (e) {
+                                                                            alert("Error eliminando imagen");
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors"
+                                                                title="Eliminar imagen"
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-gray-500 italic mb-4">No hay imágenes relacionadas guardadas.</p>
+                                    )}
+                                </div>
+
+                                {/* New Image Previews (to be uploaded) */}
                                 {imagePreviews.length > 0 && (
                                     <div className="space-y-3 mb-4">
+                                        <h5 className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Nuevas imágenes a subir</h5>
                                         {imagePreviews.map((url, idx) => (
                                             <div key={`new-${idx}`} className="flex items-center space-x-4 p-2 border border-blue-100 bg-blue-50 rounded-md">
                                                 <img src={url} alt="New Preview" className="h-16 w-16 object-cover rounded" />
@@ -337,7 +465,7 @@ export default function ProductoModal({ isOpen, onClose, onSubmit, initialProduc
                                         className="flex items-center text-[#742f37] font-semibold hover:text-red-800 transition-colors"
                                     >
                                         <Plus className="w-5 h-5 mr-1" />
-                                        Agregar otra imagen
+                                        Agregar imagenes relacionadas
                                     </button>
                                 </div>
                             </div>

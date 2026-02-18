@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { Venta } from "../models/Venta";
 import { DetalleVenta } from "../models/DetalleVenta";
-import { TipoPedido } from "../models/TipoPedido";
+import { EstadoPedido } from "../models/EstadoPedido";
 
 export class VentaService {
 
@@ -12,7 +12,7 @@ export class VentaService {
             .select(`
                 *,
                 cliente:id_comprador (*),
-                tipo_pedido:id_tipo_pedido (*),
+                estado_pedido:id_estado (*),
                 detalles:detalle_venta (
                     *,
                     producto:id_producto (*)
@@ -35,7 +35,7 @@ export class VentaService {
             .select(`
                 *,
                 cliente:id_comprador (*),
-                tipo_pedido:id_tipo_pedido (*),
+                estado_pedido:id_estado (*),
                 detalles:detalle_venta (
                     *,
                     producto:id_producto (*)
@@ -55,6 +55,8 @@ export class VentaService {
     // Create a new sale with details (Transaction-like)
     static async create(venta: Partial<Venta>, detalles: Partial<DetalleVenta>[]): Promise<Venta | null> {
         try {
+            console.log("Attempting to create sale:", venta); // LOG DATA
+
             // 1. Insert Venta
             const { data: newVenta, error: ventaError } = await supabase
                 .from('venta')
@@ -62,10 +64,17 @@ export class VentaService {
                 .select()
                 .single();
 
-            if (ventaError) throw ventaError;
+            if (ventaError) {
+                console.error("Supabase Error creating Venta:", ventaError);
+                console.error("Error Code:", ventaError.code);
+                console.error("Error Details:", ventaError.details);
+                console.error("Error Hint:", ventaError.hint);
+                throw ventaError;
+            }
             if (!newVenta) throw new Error("Sale creation failed");
 
             const ventaId = newVenta.id_venta;
+            console.log("Sale created successfully, ID:", ventaId);
 
             // 2. Insert Details
             if (detalles.length > 0) {
@@ -78,22 +87,26 @@ export class VentaService {
                     .from('detalle_venta')
                     .insert(detallesWithId);
 
-                if (detallesError) throw detallesError;
+                if (detallesError) {
+                    console.error("Supabase Error creating Details:", detallesError);
+                    throw detallesError;
+                }
             }
 
             return newVenta as Venta;
 
         } catch (error) {
-            console.error("Error creating sale:", error);
+            console.error("Error creating sale (catch block):", error);
             throw error;
         }
     }
 
     // Update sale status
-    static async updateStatus(id: number, id_tipo_pedido: number): Promise<void> {
+    static async updateStatus(id: number, id_estado: number): Promise<void> {
+        console.log(`[VentaService] Updating status for ID ${id} to ${id_estado}`);
         const { error } = await supabase
             .from('venta')
-            .update({ id_tipo_pedido })
+            .update({ id_estado })
             .eq('id_venta', id);
 
         if (error) {
@@ -103,17 +116,17 @@ export class VentaService {
     }
 
     // Get all order types
-    static async getTiposPedido(): Promise<TipoPedido[]> {
+    static async getEstadosPedido(): Promise<EstadoPedido[]> {
         const { data, error } = await supabase
-            .from('tipo_pedido')
+            .from('estado_pedido')
             .select('*')
-            .order('id_tipo_pedido', { ascending: true });
+            .order('id_estado', { ascending: true });
 
         if (error) {
-            console.error("Error fetching order types:", error);
+            console.error("Error fetching order states:", error);
             throw error;
         }
 
-        return data as TipoPedido[];
+        return data as EstadoPedido[];
     }
 }

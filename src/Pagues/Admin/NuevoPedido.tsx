@@ -116,7 +116,7 @@ export default function NuevoPedido() {
         try {
             const ventaData = {
                 id_comprador: selectedClient.dni_cliente,
-                id_tipo_pedido: 1, // 1 = Pendiente
+                id_estado: 1, // 1 = Pendiente
                 total_venta: total,
                 direccion_envio: shippingAddress,
                 notas: notes,

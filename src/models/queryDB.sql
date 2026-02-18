@@ -83,9 +83,9 @@ CREATE SEQUENCE api.tamano_id_tamano_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
--- DROP SEQUENCE api.tipo_pedido_id_tipo_pedido_seq;
+-- DROP SEQUENCE api.estado_pedido_id_estado_pedido_seq;
 
-CREATE SEQUENCE api.tipo_pedido_id_tipo_pedido_seq
+CREATE SEQUENCE api.estado_pedido_id_estado_pedido_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -191,16 +191,16 @@ CREATE TABLE api.tamano (
 );
 
 
--- api.tipo_pedido definition
+-- api.estado_pedido definition
 
 -- Drop table
 
--- DROP TABLE api.tipo_pedido;
+-- DROP TABLE api.estado_pedido;
 
-CREATE TABLE api.tipo_pedido (
-	id_tipo_pedido bigserial NOT NULL,
-	nombre_tipo varchar(30) NULL,
-	CONSTRAINT tipo_pedido_pkey PRIMARY KEY (id_tipo_pedido)
+CREATE TABLE api.estado_pedido (
+	id_estado_pedido bigserial NOT NULL,
+	nombre_estado varchar(30) NULL,
+	CONSTRAINT estado_pedido_pkey PRIMARY KEY (id_estado_pedido)
 );
 
 
@@ -286,14 +286,14 @@ CREATE TABLE api.producto_material (
 CREATE TABLE api.venta (
 	id_venta bigserial NOT NULL,
 	id_comprador varchar(20) NULL,
-	id_tipo_pedido int8 NULL,
+	id_estado_pedido int8 NULL,
 	total_venta numeric(10, 2) NULL,
 	fecha_venta timestamp DEFAULT now() NULL,
 	direccion_envio text NULL,
 	notas text NULL,
 	CONSTRAINT venta_pkey PRIMARY KEY (id_venta),
 	CONSTRAINT venta_id_comprador_fkey FOREIGN KEY (id_comprador) REFERENCES api.cliente(dni_cliente),
-	CONSTRAINT venta_id_tipo_pedido_fkey FOREIGN KEY (id_tipo_pedido) REFERENCES api.tipo_pedido(id_tipo_pedido)
+	CONSTRAINT venta_id_estado_pedido_fkey FOREIGN KEY (id_estado_pedido) REFERENCES api.estado_pedido(id_estado_pedido)
 );
 
 

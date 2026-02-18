@@ -78,7 +78,7 @@ export default function AdmProductos() {
         }
     };
 
-    const handleSaveProduct = async (productData: Partial<Producto>, images: File[], colorIds: number[]) => {
+    const handleSaveProduct = async (productData: Partial<Producto>, images: File[], colorIds: number[], tamano?: { ancho: number; length: number }) => {
         try {
             setIsSaving(true);
 
@@ -88,7 +88,8 @@ export default function AdmProductos() {
                     editingProduct.id_producto,
                     productData,
                     images,
-                    colorIds
+                    colorIds,
+                    { ...tamano, id_tamano: editingProduct.id_tamano, ancho: tamano?.ancho || 0, length: tamano?.length || 0 } // Pass existing tamano ID if any
                 );
 
                 if (updated) {
@@ -100,7 +101,7 @@ export default function AdmProductos() {
                 }
             } else {
                 // Create
-                const created = await ProductoService.createFullProduct(productData, images, colorIds);
+                const created = await ProductoService.createFullProduct(productData, images, colorIds, tamano);
                 if (created) {
                     // setProductos(prev => [created, ...prev]); 
                     loadData(); // Reload to get relations

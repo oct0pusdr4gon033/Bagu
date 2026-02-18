@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Venta } from '../../models/Venta';
+import { EstadoPedido } from '../../models/EstadoPedido';
 import { VentaService } from '../../services/Venta.service';
+import { getEstados } from '../../services/Estado.service';
+import { supabase } from '../../lib/supabase';
 import PedidoHeaderSection from '../../sections/adm/Pedido/PedidoHeaderSection';
 import PedidoGridSection from '../../sections/adm/Pedido/PedidoGridSection';
 import PedidoDetailModal from '../../sections/adm/Pedido/PedidoDetailModal';
@@ -8,15 +11,23 @@ import PedidoDetailModal from '../../sections/adm/Pedido/PedidoDetailModal';
 export default function Pedidos() {
     const [pedidos, setPedidos] = useState<Venta[]>([]);
     const [filteredPedidos, setFilteredPedidos] = useState<Venta[]>([]);
+    const [estados, setEstados] = useState<EstadoPedido[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'Pendiente' | 'En Proceso' | 'Entregado'>('all');
     const [selectedPedido, setSelectedPedido] = useState<Venta | null>(null);
 
     useEffect(() => {
         loadPedidos();
+        loadEstados();
     }, []);
 
     useEffect(() => {
+        const checkSession = async () => {
+            const { data } = await supabase.auth.getSession();
+            console.log("Current Session:", data.session);
+            console.log("User Role:", data.session?.user?.role);
+        };
+        checkSession();
         applyFilters();
     }, [pedidos, filter]);
 
@@ -24,6 +35,7 @@ export default function Pedidos() {
         try {
             setLoading(true);
             const data = await VentaService.getAll();
+            console.log('Pedidos cargados:', data);
             setPedidos(data);
         } catch (error) {
             console.error(error);
@@ -32,15 +44,26 @@ export default function Pedidos() {
         }
     };
 
+    const loadEstados = async () => {
+        try {
+            const data = await getEstados();
+            console.log('Estados cargados:', data);
+            setEstados(data);
+        } catch (error) {
+            console.error('Error cargando estados:', error);
+        }
+    };
+
     const applyFilters = () => {
         if (filter === 'all') {
             setFilteredPedidos(pedidos);
         } else {
-            setFilteredPedidos(pedidos.filter(p => p.tipo_pedido?.nombre_tipo === filter));
+            setFilteredPedidos(pedidos.filter(p => p.estado_pedido?.nombre_estado === filter));
         }
     };
 
     const handleUpdateStatus = async (id: number, statusId: number) => {
+        console.log(`[Pedidos] Handle update status called. ID: ${id}, StatusID: ${statusId}`);
         if (window.confirm("¿Seguro que deseas cambiar el estado del pedido?")) {
             try {
                 await VentaService.updateStatus(id, statusId);
@@ -54,9 +77,9 @@ export default function Pedidos() {
     // Calculate counts for header badges
     const counts = {
         total: pedidos.length,
-        pending: pedidos.filter(p => p.tipo_pedido?.nombre_tipo === 'Pendiente').length,
-        processing: pedidos.filter(p => p.tipo_pedido?.nombre_tipo === 'En Proceso').length,
-        delivered: pedidos.filter(p => p.tipo_pedido?.nombre_tipo === 'Entregado').length,
+        pending: pedidos.filter(p => p.estado_pedido?.nombre_estado === 'Pendiente').length,
+        processing: pedidos.filter(p => p.estado_pedido?.nombre_estado === 'En Proceso').length,
+        delivered: pedidos.filter(p => p.estado_pedido?.nombre_estado === 'Entregado').length,
     };
 
     return (
@@ -77,6 +100,7 @@ export default function Pedidos() {
             ) : (
                 <PedidoGridSection
                     pedidos={filteredPedidos}
+                    estados={estados}
                     onViewDetail={setSelectedPedido}
                     onUpdateStatus={handleUpdateStatus}
                 />
