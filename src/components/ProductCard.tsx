@@ -1,4 +1,4 @@
-// components/ProductCard.tsx
+import { Link } from 'react-router-dom';
 import { ProductoCard } from "../models/ProductoCard";
 
 interface ProductCardProps {
@@ -7,7 +7,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ productoCard }: ProductCardProps) {
     return (
-        <div className="flex flex-col items-center text-center gap-3 relative group">
+        <Link to={`/product/${productoCard.id}`} className="flex flex-col items-center text-center gap-3 relative group w-full">
             <div className="w-full aspect-[4/5] bg-[#e8e6e1] overflow-hidden relative">
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
@@ -49,6 +49,6 @@ export default function ProductCard({ productoCard }: ProductCardProps) {
                     </p>
                 )}
             </div>
-        </div>
+        </Link>
     );
 }

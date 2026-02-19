@@ -15,6 +15,9 @@ import NuevoPedido from "./Pagues/Admin/NuevoPedido";
 import AdmClientes from "./Pagues/Admin/Clientes";
 import AdmCategorias from "./Pagues/Admin/Categorias";
 import AdmColores from "./Pagues/Admin/Colores";
+import Colecciones from "./Pagues/Colecciones";
+import DetalleCategoria from "./Pagues/DetalleCategoria";
+import DetalleProducto from "./Pagues/DetalleProducto";
 
 function App() {
   return (
@@ -27,6 +30,9 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/collections" element={<Colecciones />} />
+          <Route path="/collections/:id" element={<DetalleCategoria />} />
+          <Route path="/product/:id" element={<DetalleProducto />} />
         </Route>
 
         <Route element={<AdminLayout />}>

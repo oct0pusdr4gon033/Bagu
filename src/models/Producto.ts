@@ -16,6 +16,8 @@ export class Producto {
     // Optional: relations for UI display
     categoria?: { nombre_categoria: string };
     imagenes?: { id_imagen: number; imagen_url: string }[]; // Relation from producto_imagen
+    tamano?: { ancho: number; largo: number };
+    producto_color?: { color: { id_color: number; nombre_color: string; codigo_color: string } }[];
 
     constructor(data: Partial<Producto>) {
         this.id_producto = data.id_producto;

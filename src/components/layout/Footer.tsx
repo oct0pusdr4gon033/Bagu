@@ -9,11 +9,8 @@ export default function Footer() {
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center gap-2 text-white">
                                 <span className="material-symbols-outlined text-accent-gold">
-                                    Bagu
+                                    <img src="/logo.png" alt="logo" className="w-12 h-12" />
                                 </span>
-                                <h2 className="text-lg font-serif font-bold tracking-wide">
-                                    Distinción a la mano
-                                </h2>
                             </div>
 
                             <p className="text-[#b2a4a6] text-sm max-w-[250px]">
@@ -25,20 +22,21 @@ export default function Footer() {
                             {/* Shop */}
                             <div className="flex flex-col gap-4">
                                 <h4 className="text-white font-bold text-sm tracking-widest uppercase">
-                                    Compra
+                                    Productos
                                 </h4>
                                 <div className="flex flex-col gap-2 text-[#b2a4a6] text-sm">
-                                    <a className="hover:text-accent-gold transition-colors" href="#">Carteras</a>
-                                    <a className="hover:text-accent-gold transition-colors" href="#">Bolsos</a>
-                                    <a className="hover:text-accent-gold transition-colors" href="#">Accesorios</a>
-                                    <a className="hover:text-accent-gold transition-colors" href="#">Novedades</a>
+                                    <a className="hover:text-accent-gold transition-colors" href="/collections/2">Carteras</a>
+                                    <a className="hover:text-accent-gold transition-colors" href="/collections/3">Bolsos</a>
+                                    <a className="hover:text-accent-gold transition-colors" href="/collections/1">Morrales</a>
+                                    <a className="hover:text-accent-gold transition-colors" href="/collections/7">Billeteras</a>
+                                    <a className="hover:text-accent-gold transition-colors" href="/collections/6">Maletines</a>
                                 </div>
                             </div>
 
                             {/* Company */}
                             <div className="flex flex-col gap-4">
                                 <h4 className="text-white font-bold text-sm tracking-widest uppercase">
-                                    Compañia
+                                    Empresa
                                 </h4>
                                 <div className="flex flex-col gap-2 text-[#b2a4a6] text-sm">
                                     <a className="hover:text-accent-gold transition-colors" href="#">About Us</a>
@@ -51,17 +49,17 @@ export default function Footer() {
                             {/* Social */}
                             <div className="flex flex-col gap-4">
                                 <h4 className="text-white font-bold text-sm tracking-widest uppercase">
-                                    Siguenos
+                                    Redes Sociales
                                 </h4>
                                 <div className="flex gap-4 text-white text-sm">
                                     <span className="cursor-pointer hover:text-accent-gold transition-colors">
-                                        Instagram
+                                        <a href="https://www.instagram.com/agucuero/">Instagram</a>
                                     </span>
                                     <span className="cursor-pointer hover:text-accent-gold transition-colors">
-                                        Facebook
+                                        <a href="https://www.facebook.com/agucuero">Facebook</a>
                                     </span>
                                     <span className="cursor-pointer hover:text-accent-gold transition-colors">
-                                        TikTok
+                                        <a href="https://www.tiktok.com/@agucuero">TikTok</a>
                                     </span>
                                 </div>
                             </div>

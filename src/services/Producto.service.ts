@@ -35,13 +35,19 @@ export class ProductoService {
         return data as Producto[];
     }
 
+    static async getProductosByCategoria(idCategoria: number): Promise<Producto[]> {
+        return this.fetchProducts({ categoria: idCategoria });
+    }
+
     static async fetchProductById(id: number): Promise<Producto | null> {
         const { data, error } = await supabase
             .from('producto')
             .select(`
                 *,
                 categoria:id_categoria ( nombre_categoria ),
-                imagenes:producto_imagen ( id_imagen, imagen_url )
+                imagenes:producto_imagen ( id_imagen, imagen_url ),
+                tamano:id_tamano ( ancho, largo ),
+                producto_color ( color ( id_color, nombre_color, codigo_color ) )
             `)
             .eq('id_producto', id)
             .single();

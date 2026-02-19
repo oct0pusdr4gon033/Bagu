@@ -11,10 +11,10 @@ export default function LandingPage() {
     return (
         <div className="bg-background-dark text-white font-display overflow-x-hidden">
             <Hero />
-            <ReviewsSection />
             <RefinedEssentials />
             <ContactSupportSection />
             <OurStorySection />
+            <ReviewsSection />
             <Footer />
         </div>
     )

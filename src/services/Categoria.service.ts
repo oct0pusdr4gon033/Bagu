@@ -12,6 +12,21 @@ export const getCategorias = async (): Promise<Categoria[]> => {
     return data as Categoria[];
 };
 
+// Obtener categoría por ID
+export const getCategoriaById = async (id: number): Promise<Categoria | null> => {
+    const { data, error } = await supabase
+        .from('categoria')
+        .select('*')
+        .eq('id_categoria', id)
+        .single();
+
+    if (error) {
+        console.error("Error fetching category by id:", error);
+        return null;
+    }
+    return data as Categoria;
+};
+
 // Crear una nueva categoría
 export const createCategoria = async (categoria: Partial<Categoria>): Promise<Categoria> => {
     // 1. Obtener el ID máximo actual
