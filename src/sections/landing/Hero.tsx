@@ -1,5 +1,10 @@
+import { useNavigate } from "react-router-dom";
+
 export function Hero() {
+
+    const navigate = useNavigate();
     return (
+
 
         <section className="relative min-h-[650px] flex items-center justify-center text-center">
             <div
@@ -18,12 +23,13 @@ export function Hero() {
                 </h2>
 
                 <p className="mt-6 text-white/80 text-lg">
-                    Productos de cuero de alta calidad cosidos a mano y elaborados para quienes valoran la
+                    Carteras, bolsos, morrales, billeteras y maletines de cuero de alta calidad cosidos a mano y elaborados para quienes valoran la
                     herencia, el detalle y la permanencia.
                 </p>
 
-                <button className="mt-10 px-8 py-3 bg-primary hover:bg-[#5a242b] transition-all uppercase tracking-widest text-sm font-bold">
-                    Ver colección
+                <button onClick={() => navigate("/collections")}
+                    className="mt-10 px-8 py-3 bg-primary hover:bg-[#5a242b] transition-all uppercase tracking-widest text-sm font-bold">
+                    Ver Productos
                 </button>
             </div>
         </section>
