@@ -4,6 +4,7 @@ import {
   Route
 } from "react-router-dom";
 import LandingPage from "./Pagues/Landing/Landing";
+import NuestraHistoria from "./Pagues/NuestraHistoria";
 import LoginPague from "./Pagues/Login/LoginPague";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
@@ -30,6 +31,7 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<NuestraHistoria />} />
           <Route path="/collections" element={<Colecciones />} />
           <Route path="/collections/:id" element={<DetalleCategoria />} />
           <Route path="/product/:id" element={<DetalleProducto />} />

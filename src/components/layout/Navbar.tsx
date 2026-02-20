@@ -2,23 +2,25 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
     return (
-        <header className="sticky top-0 z-50 bg-[#1d1516]/90 backdrop-blur border-b border-[#342d2d]">
-            <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-4 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-accent-gold text-3xl">
-                        <img src="/logo.png" alt="Logo" className="w-20 h-20" />
+        <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100">
+            <div className="max-w-[1440px] mx-auto px-8 lg:px-12 py-5 flex items-center justify-between">
+                <div className="flex items-center gap-8">
+                    <Link to="/" className="flex items-center gap-2 text-primary-wine">
+                        <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>
 
-                    </span>
-                    <h1 className="text-2xl font-bold text-accent-gold">AGÚ</h1>
+                            <img src="logo.png" alt="loguitoBagu" className="w-12 h-12" />
 
+                        </span>
+                        <h1 className="text-xl font-serif font-semibold tracking-[0.2em] uppercase">AGÚ</h1>
+                    </Link>
+                    <nav className="hidden lg:flex items-center gap-10 ml-12">
+                        <Link to="/" className="text-[13px] font-medium uppercase tracking-widest hover:text-accent-gold transition-colors">Inicio</Link>
+                        <Link to="/collections" className="text-[13px] font-medium uppercase tracking-widest hover:text-accent-gold transition-colors">Colecciones</Link>
+                        <Link to="/about" className="text-[13px] font-medium uppercase tracking-widest hover:text-accent-gold transition-colors">Nuestra Historia</Link>
+                    </nav>
                 </div>
-                <nav className="hidden lg:flex gap-8 text-sm">
-                    <a href="/" className="hover:text-accent-gold transition-colors">Inicio</a>
-                    <Link to="/collections" className="hover:text-accent-gold transition-colors">Colecciones</Link>
-                    <a href="#" className="hover:text-accent-gold transition-colors">Nuestra historia</a>
-                </nav>
+
             </div>
         </header>
-
     );
 }

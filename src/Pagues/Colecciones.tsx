@@ -24,14 +24,14 @@ export default function Colecciones() {
     }, []);
 
     return (
-        <div className="bg-background-dark min-h-screen text-white font-display">
+        <div className="bg-white min-h-screen text-[#1d1516] font-display">
             {/* Reusing Hero or a simplified header? Let's use a simple header for now or reusing Hero might be too much. 
                 Let's make a simple header. */}
             <div className="pt-24 pb-12 px-6 text-center">
                 <p className="text-xs tracking-[0.3em] text-accent-gold mb-3 uppercase">
                     Explora
                 </p>
-                <h1 className="font-serif text-4xl md:text-5xl text-white mb-6">
+                <h1 className="font-serif text-4xl md:text-5xl text-[#1d1516] mb-6">
                     Nuestras Colecciones
                 </h1>
                 <div className="w-12 h-px bg-accent-gold mx-auto" />
@@ -48,12 +48,12 @@ export default function Colecciones() {
                             <Link
                                 key={categoria.id_categoria}
                                 to={`/collections/${categoria.id_categoria}`}
-                                className="group relative overflow-hidden rounded-lg aspect-[4/3] block bg-[#1d1516] border border-[#342d2d] hover:border-accent-gold transition-colors duration-300"
+                                className="group relative overflow-hidden rounded-lg aspect-[4/3] block bg-gray-50 border border-gray-200 hover:border-accent-gold transition-colors duration-300"
                             >
                                 {/* We don't have category images in the model yet, so we'll use a placeholder or pattern */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
 
-                                <div className="absolute inset-0 flex items-center justify-center bg-[#2a1d1e] group-hover:scale-105 transition-transform duration-700">
+                                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 group-hover:scale-105 transition-transform duration-700">
                                     {categoria.url_categoria ? (
                                         <img
                                             src={categoria.url_categoria}

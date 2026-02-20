@@ -4,6 +4,22 @@
 
 @layer base {
     body {
-        background-color: #f5f5f5;
+        @apply bg-pure-white text-text-main font-sans antialiased overflow-x-hidden;
     }
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #FFFFFF;
+}
+::-webkit-scrollbar-thumb {
+    background: #E5E5E5;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #D4AF37;
+}
+.hero-gradient {
+    background: linear-gradient(to right, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
 }

@@ -3,7 +3,7 @@ import Navbar from "../components/layout/Navbar";
 
 export default function MainLayout() {
     return (
-        <div className="min-h-screen flex flex-col bg-background-dark text-white">
+        <div className="min-h-screen flex flex-col bg-white text-[#1d1516]">
             <Navbar />
             <main className="flex-1">
                 <Outlet />

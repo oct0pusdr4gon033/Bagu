@@ -9,7 +9,7 @@ import Footer from '../../components/layout/Footer';
 
 export default function LandingPage() {
     return (
-        <div className="bg-background-dark text-white font-display overflow-x-hidden">
+        <div className="font-display overflow-x-hidden">
             <Hero />
             <RefinedEssentials />
             <ContactSupportSection />

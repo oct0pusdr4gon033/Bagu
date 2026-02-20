@@ -1,32 +1,31 @@
 export default function ContactSupportSection() {
     return (
-        <section className="bg-primary text-white py-16">
-            <div className="flex justify-center w-full px-6 lg:px-10">
-                <div className="max-w-[700px] w-full text-center flex flex-col gap-6">
+        <section className="bg-soft-gray py-24">
+            <div className="max-w-[1440px] mx-auto px-8 lg:px-12 text-center">
+                <div className="max-w-xl mx-auto flex flex-col items-center gap-8">
+                    <h3 className="text-3xl font-serif text-primary-wine">El Diario</h3>
 
-                    <h3 className="font-serif text-3xl font-medium">
-                        Atención Personalizada
-                    </h3>
-
-                    <p className="text-white/80 font-light">
-                        ¿Tienes dudas sobre nuestros productos o necesitas una recomendación?
-                        Nuestro equipo está listo para ayudarte.
+                    <p className="text-gray-500 font-light">
+                        Únete a nuestro círculo íntimo para obtener acceso anticipado a colecciones de edición limitada e historias de artesanía.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-[480px] mx-auto">
+                    <form className="w-full flex flex-col sm:flex-row gap-0 group" onClick={(e) => e.preventDefault()}>
                         <input
                             type="email"
-                            placeholder="Tu correo electrónico"
-                            className="flex-1 bg-white/10 border border-white/20 text-white placeholder-white/50 px-4 py-3 rounded-sm focus:outline-none focus:border-accent-gold transition-colors text-sm"
+                            placeholder="Tu Correo Electrónico"
+                            className="flex-1 bg-white border-gray-200 focus:ring-0 focus:border-accent-gold px-6 py-4 text-sm font-light tracking-wide outline-none transition-all"
                         />
-
                         <button
-                            className="bg-[#1d1516] text-white px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-[#1d1516] transition-colors rounded-sm"
+                            type="submit"
+                            className="bg-primary-wine text-white px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-accent-gold transition-colors duration-500"
                         >
-                            Contactar
+                            Suscribirse
                         </button>
-                    </div>
+                    </form>
 
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                        Al suscribirte, aceptas nuestra Política de Privacidad
+                    </p>
                 </div>
             </div>
         </section>

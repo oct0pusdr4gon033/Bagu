@@ -51,7 +51,7 @@ export default function DetalleCategoria() {
 
     if (loading) {
         return (
-            <div className="bg-background-dark min-h-screen text-white flex justify-center items-center">
+            <div className="bg-white min-h-screen text-[#1d1516] flex justify-center items-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-gold"></div>
             </div>
         );
@@ -59,7 +59,7 @@ export default function DetalleCategoria() {
 
     if (!categoria) {
         return (
-            <div className="bg-background-dark min-h-screen text-white font-display flex flex-col items-center justify-center p-6 text-center">
+            <div className="bg-white min-h-screen text-[#1d1516] font-display flex flex-col items-center justify-center p-6 text-center">
                 <h1 className="text-3xl font-serif mb-4">Categoría no encontrada</h1>
                 <Link to="/collections" className="text-accent-gold hover:underline">
                     Volver a Colecciones
@@ -69,12 +69,12 @@ export default function DetalleCategoria() {
     }
 
     return (
-        <div className="bg-background-dark min-h-screen text-white font-display">
+        <div className="bg-white min-h-screen text-[#1d1516] font-display">
             {/* Header */}
             <div className="pt-24 pb-12 px-6 text-center relative">
                 <Link
                     to="/collections"
-                    className="absolute left-6 top-24 md:left-12 flex items-center text-gray-400 hover:text-white transition-colors"
+                    className="absolute left-6 top-24 md:left-12 flex items-center text-gray-400 hover:text-[#1d1516] transition-colors"
                 >
                     <ChevronLeft className="w-5 h-5 mr-1" />
                     Volver
@@ -83,7 +83,7 @@ export default function DetalleCategoria() {
                 <p className="text-xs tracking-[0.3em] text-accent-gold mb-3 uppercase">
                     Colección
                 </p>
-                <h1 className="font-serif text-4xl md:text-5xl text-white mb-4">
+                <h1 className="font-serif text-4xl md:text-5xl text-[#1d1516] mb-4">
                     {categoria.nombre_categoria}
                 </h1>
                 {categoria.descripcion_categoria && (

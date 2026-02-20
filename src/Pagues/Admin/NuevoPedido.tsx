@@ -352,7 +352,7 @@ export default function NuevoPedido() {
                                 <p>No hay productos en el pedido</p>
                             </div>
                         ) : (
-                            cart.map((item, index) => {
+                            cart.map((item) => {
                                 // Unique key using product id and color id (or index as fallback if no color)
                                 const key = `${item.product.id_producto}-${item.color?.id_color || 'no-color'}`;
                                 const price = getPrice(item.product);
