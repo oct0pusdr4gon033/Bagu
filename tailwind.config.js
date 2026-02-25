@@ -14,6 +14,7 @@ export default {
         'pure-white': '#FFFFFF',
         'soft-gray': '#F5F5F5',
         'text-main': '#1A1A1A',
+        'deep-charcoal': '#1A1A1A',
       },
       fontFamily: {
         display: ['Manrope', 'sans-serif'],

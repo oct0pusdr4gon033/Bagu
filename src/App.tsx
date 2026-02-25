@@ -3,6 +3,7 @@ import {
   Routes,
   Route
 } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 import LandingPage from "./Pagues/Landing/Landing";
 import NuestraHistoria from "./Pagues/NuestraHistoria";
 import LoginPague from "./Pagues/Login/LoginPague";
@@ -22,33 +23,35 @@ import DetalleProducto from "./Pagues/DetalleProducto";
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <HelmetProvider>
+      <Router>
+        <Routes>
 
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<LoginPague />} />
-        </Route>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPague />} />
+          </Route>
 
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/about" element={<NuestraHistoria />} />
-          <Route path="/collections" element={<Colecciones />} />
-          <Route path="/collections/:id" element={<DetalleCategoria />} />
-          <Route path="/product/:id" element={<DetalleProducto />} />
-        </Route>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<NuestraHistoria />} />
+            <Route path="/collections" element={<Colecciones />} />
+            <Route path="/collections/:id" element={<DetalleCategoria />} />
+            <Route path="/product/:id" element={<DetalleProducto />} />
+          </Route>
 
-        <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard" element={<AdmDashboard />} />
-          <Route path="/admin/productos" element={<AdmProductos />} />
-          <Route path="/admin/pedidos" element={<AdmPedidos />} />
-          <Route path="/admin/pedidos/nuevo" element={<NuevoPedido />} />
-          <Route path="/admin/clientes" element={<AdmClientes />} />
-          <Route path="/admin/categorias" element={<AdmCategorias />} />
-          <Route path="/admin/colores" element={<AdmColores />} />
-        </Route>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdmDashboard />} />
+            <Route path="/admin/productos" element={<AdmProductos />} />
+            <Route path="/admin/pedidos" element={<AdmPedidos />} />
+            <Route path="/admin/pedidos/nuevo" element={<NuevoPedido />} />
+            <Route path="/admin/clientes" element={<AdmClientes />} />
+            <Route path="/admin/categorias" element={<AdmCategorias />} />
+            <Route path="/admin/colores" element={<AdmColores />} />
+          </Route>
 
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </HelmetProvider>
   );
 }
 
