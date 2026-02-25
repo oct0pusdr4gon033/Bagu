@@ -1,10 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="es-PE" class="dark">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bagu Cueros</title>
+
+  <!-- Base SEO -->
+  <title>Bagu Cueros | Productos de cuero en Perú</title>
+  <meta name="description"
+    content="Compra productos de cuero premium en Perú. Billeteras, correas y accesorios de alta calidad. Envíos nacionales." />
+  <meta name="keywords" content="cuero Perú, billeteras cuero, correas cuero, tienda cuero Cajamarca" />
+  <meta name="author" content="Bagu Cueros" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Bagu Cueros | Productos de cuero premium" />
+  <meta property="og:description" content="Descubre productos de cuero de alta calidad en Perú." />
+  <meta property="og:image" content="https://bagu-two.vercel.app/default-og-image.jpg" />
+  <meta property="og:url" content="https://bagu-two.vercel.app/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+
   <link rel="icon" type="image/png" href="/logo.svg" />
 
   <!-- Google Fonts -->
@@ -21,6 +38,21 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+
+  <!-- Schema.org Data (Structured Data) -->
+  <script type="application/ld+json">
+  {
+   "@context": "https://schema.org",
+   "@type": "Store",
+   "name": "Bagu Cueros",
+   "image": "https://bagu-two.vercel.app/logo.svg",
+   "address": {
+     "@type": "PostalAddress",
+     "addressCountry": "PE"
+   },
+   "url": "https://bagu-two.vercel.app/"
+  }
+  </script>
 </body>
 
 </html>
